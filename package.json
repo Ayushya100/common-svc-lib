@@ -1,0 +1,40 @@
+{
+  "name": "common-svc-lib",
+  "version": "1.0.0",
+  "description": "A shared internal library providing core utilities and reusable modules for Node.js microservices built with Express. This library will help in reducing the code duplication and ensures consistent implementation across all the services.\r ## Features\r - Centralized logging\r - Standard response codes & messages\r - Database utilities for connection handling\r - Predefined API Response and API Error structrues\r - Reusable middlewares: Access Token validation, Parameter validation, & Global error handler.\r - Reusable base classes for: App initialization, Router configuration, Service logic, & Controller logic.\r ## Documentation\r - **DB Model Documentation:** [Finance Tracker DB Model](https://app.eraser.io/workspace/4Hwce2ZbbDoeHojTohVe?origin=share)\r ---\r **Finance Tracker** - Simplifying Financial Management for Everyone!",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ayushya100/common-svc-lib.git"
+  },
+  "keywords": [
+    "node.js",
+    "express",
+    "javascript",
+    "library",
+    "redis"
+  ],
+  "author": "Ayushya Jaiswal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ayushya100/common-svc-lib/issues"
+  },
+  "homepage": "https://github.com/Ayushya100/common-svc-lib#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
