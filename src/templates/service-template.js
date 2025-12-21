@@ -13,6 +13,7 @@ import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yaml';
 import { logger } from '../utils/index.js';
+import { infoLogger } from '../middlewares/index.js';
 import { generalServiceConfig } from '../../constants.js';
 
 const log = logger('service-configuration');
@@ -147,6 +148,8 @@ Service.prototype.initializeApp = function () {
   }
 
   this.app.use(express.static('public'));
+
+  this.app.use(infoLogger);
 };
 
 Service.prototype.initializeOpenAPI = async function () {
