@@ -1,6 +1,7 @@
 'use strict';
 
 import axios from 'axios';
+import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import express from 'express';
@@ -149,6 +150,19 @@ Service.prototype.initializeApp = function () {
       })
     );
   }
+
+  // Compression Configuration
+  this.app.use(
+    compression({
+      threshold: 1024,
+      filter: (req, res) => {
+        if (req.headers['x-no-compression']) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    })
+  );
 
   this.app.use(express.static('public'));
 
