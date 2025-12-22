@@ -4,7 +4,7 @@ import axios from 'axios';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import express from 'express';
-import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 import helmet from 'helmet';
 import * as OpenApiValidator from 'express-openapi-validator';
 import os from 'os';
@@ -50,6 +50,7 @@ class Service {
     this.openAPISpec = path.join(appPath, 'openapi.yaml');
 
     this.initializeApp();
+    this.initializeOpenAPI();
   }
 }
 
@@ -154,11 +155,11 @@ Service.prototype.initializeApp = function () {
   this.app.use(infoLogger);
 };
 
-Service.prototype.initializeOpenAPI = async function () {
+Service.prototype.initializeOpenAPI = function () {
   log.debug('App openAPI validator middleware initialization');
   // Initialize OpenAPI Specs
   if (this.openAPIEnabled) {
-    const openAPIFile = await readFile(this.openAPISpec, 'utf8');
+    const openAPIFile = readFileSync(this.openAPISpec, 'utf8');
     const apiSpec = yaml.parse(openAPIFile);
 
     // Service Swagger UI
