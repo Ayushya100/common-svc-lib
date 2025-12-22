@@ -52,6 +52,7 @@ const ErrorBuilder = (err) => {
   const errors = err.errors || [];
   const stack = errors && errors.stack ? errors.stack : '';
   err.message = translate(err.message);
+  err.data = err.data ? err.data : [];
 
   const apiError = new ApiError(
     err.status || 500,

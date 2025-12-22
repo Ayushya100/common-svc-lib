@@ -211,13 +211,26 @@ Service.prototype.buildConnection = function () {
   const PORT = this.serviceConfig.PORT;
   const PROTOCOL = this.serviceConfig.PROTOCOL;
 
-  this.app.listen(PORT, HOST, async () => {
+  const server = this.app.listen(PORT, HOST, async () => {
     log.info(`[${serviceName}] Server is running on port : ${PORT}`);
     log.info(
       `Uptime : ${process.uptime()} seconds | Timestamp : ${Date.now()} | Hostname : ${os.hostname()}`
     );
     // TODO - Add register service configuration for updating the PORT and PROTOCOL of service name
   });
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+  process.on('uncaughtException', shutdown);
+  process.on('unhandledRejection', shutdown);
+
+  function shutdown() {
+    log.error('Shutting down server...');
+    server.close(() => {
+      log.success('Server closed');
+      process.exit(0);
+    });
+  }
 };
 
 Service.prototype.testConnection = async function () {
@@ -264,8 +277,8 @@ Service.prototype.testConnection = async function () {
     log.error(
       `[${serviceName}] Health check for service failed! Error : ${error}`
     );
+    throw new Error('Connection Failed!');
   }
-  throw new Error('Connection Failed!');
 };
 
 export default Service;

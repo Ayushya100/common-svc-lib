@@ -3,9 +3,11 @@
 import morgan from 'morgan';
 import { logger } from '../utils/index.js';
 
+const log = logger('middleware: infoLogger');
+
 const stream = {
   write: (message) => {
-    logger.info(message.trim());
+    log.info(message.trim());
   },
 };
 
