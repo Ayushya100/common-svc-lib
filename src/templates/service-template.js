@@ -221,6 +221,8 @@ Service.prototype.buildConnection = function () {
 
   process.on('SIGTERM', shutdown);
   process.on('SIGINT', shutdown);
+  process.on('uncaughtException', shutdown);
+  process.on('unhandledRejection', shutdown);
 
   function shutdown() {
     log.error('Shutting down server...');
