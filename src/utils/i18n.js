@@ -28,8 +28,7 @@ function initializeI18n() {
 
 function translate(message, locale = 'en-US') {
   const userContext = RequestContext.get();
-  log.debug('Translation check');
-  locale = userContext?.lang || locale;
+  locale = userContext?.locale || locale;
 
   if (i18n.getLocale(locale)) {
     return i18n.__({ phrase: message, locale: locale });
