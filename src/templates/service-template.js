@@ -13,8 +13,13 @@ import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yaml';
 import { logger } from '../utils/index.js';
-import { infoLogger } from '../middlewares/index.js';
+import {
+  infoLogger,
+  requestContextMiddleware,
+  errorHandler,
+} from '../middlewares/index.js';
 import { generalServiceConfig } from '../../constants.js';
+import { initializeI18n } from '../utils/index.js';
 
 const log = logger('service-configuration');
 
@@ -97,9 +102,6 @@ Service.prototype.initializeApp = function () {
         policy: 'same-origin',
       },
       strictTransportSecurity: hsts,
-      xContentTypeOptions: {
-        policy: 'nosniff',
-      },
     })
   );
 
@@ -171,13 +173,25 @@ Service.prototype.initializeOpenAPI = async function () {
   }
 };
 
-Service.prototype.registerPublicEndpoints = function() {
-  log.debug('Register service public end-points called');
-}
+Service.prototype.setUserContextFn = function () {
+  if (this.setUserContext) {
+    log.debug('App user context middleware initialized');
+    this.app.use(requestContextMiddleware);
+  }
+};
 
-Service.prototype.registerPrivateEndpoints = function() {
+Service.prototype.registerPublicEndpoints = function () {
+  log.debug('Register service public end-points called');
+};
+
+Service.prototype.registerPrivateEndpoints = function () {
   log.debug('Register service private end-points');
-}
+};
+
+Service.prototype.registerErrorHandler = function () {
+  log.debug('Global error handler middleware initialized');
+  this.app.use(errorHandler);
+};
 
 Service.prototype.buildConnection = function () {
   log.debug('Service build connection initiated');
@@ -186,8 +200,11 @@ Service.prototype.buildConnection = function () {
     process.exit(1);
   }
 
+  this.setUserContextFn();
+  initializeI18n();
   this.registerPublicEndpoints();
   this.registerPrivateEndpoints();
+  this.registerErrorHandler();
 
   const serviceName = this.serviceConfig.serviceName;
   const HOST = this.serviceConfig.HOST;
