@@ -40,6 +40,18 @@ class ApiError extends Error {
 
     this.success = status < 400;
   }
+
+  toJSON() {
+    return {
+      status: this.status,
+      message: this.message,
+      devMessage: this.devMessage,
+      type: this.type,
+      errors: this.errors,
+      data: this.data,
+      success: this.success,
+    };
+  }
 }
 
 /*
