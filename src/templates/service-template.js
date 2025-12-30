@@ -18,6 +18,7 @@ import {
   infoLogger,
   requestContextMiddleware,
   errorHandler,
+  verifyToken,
 } from '../middlewares/index.js';
 import { generalServiceConfig } from '../../constants.js';
 import { initializeI18n } from '../utils/index.js';
@@ -199,6 +200,11 @@ Service.prototype.registerPublicEndpoints = function () {
   log.debug('Register service public end-points called');
 };
 
+Service.prototype.setTokenVerification = function () {
+  log.debug('Verification token middleware initialization');
+  this.app.use(verifyToken);
+};
+
 Service.prototype.registerPrivateEndpoints = function () {
   log.debug('Register service private end-points');
 };
@@ -218,6 +224,7 @@ Service.prototype.buildConnection = function () {
   this.setUserContextFn();
   initializeI18n();
   this.registerPublicEndpoints();
+  this.setTokenVerification();
   this.registerPrivateEndpoints();
   this.registerErrorHandler();
 
