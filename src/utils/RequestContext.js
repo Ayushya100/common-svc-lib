@@ -13,6 +13,14 @@ const RequestContext = {
       store[key] = value;
     }
   },
+  setList: (list) => {
+    const store = asyncLocalStorage.getStore();
+    if (store) {
+      for (const [key, value] of Object.entries(list)) {
+        store[key] = value;
+      }
+    }
+  },
 };
 
 export default RequestContext;

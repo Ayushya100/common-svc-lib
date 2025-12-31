@@ -1,7 +1,12 @@
 'use strict';
 
 import jwt from 'jsonwebtoken';
-import { _Error, convertPrettyStringToId, logger } from '../utils/index.js';
+import {
+  _Error,
+  convertPrettyStringToId,
+  logger,
+  RequestContext,
+} from '../utils/index.js';
 import { CoreDB } from '../db/index.js';
 
 const log = logger('middleware: verify-token');
@@ -19,15 +24,17 @@ const verifyToken = async (req, res, next) => {
 
     const tokenKey = process.env.ACCESS_TOKEN_KEY;
     const refreshTokenKey = process.env.REFRESH_TOKEN_KEY;
-    const decodedToken = jwt.decode(token, tokenKey);
+    const decodedToken = jwt.verify(token, tokenKey);
     req.user = {
       id: decodedToken.id,
       username: decodedToken.username,
-      role_code: decodedToken.role_code,
+      role_code: decodedToken.role,
       scopes: decodedToken.scopes,
       isVerified: decodedToken.isVerified,
       isDeleted: decodedToken.isDeleted,
     };
+    RequestContext.setList(req.user);
+
     const userId = convertPrettyStringToId(decodedToken.id);
 
     log.info('Verify if the user has an active refresh token');

@@ -2,5 +2,6 @@
 
 import db from './dbExecScript.js';
 import CoreDB from './dbCoreScript.js';
+import DBQuery from './query.db.js';
 
-export { db, CoreDB };
+export { db, CoreDB, DBQuery };
