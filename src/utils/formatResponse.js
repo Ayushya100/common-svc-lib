@@ -38,7 +38,7 @@ const formatResponseBody = (
   });
 };
 
-const _Response = (statusCode, message, data) => {
+const _Response = (statusCode, message, data = {}) => {
   return {
     status: statusCode,
     message: message,
