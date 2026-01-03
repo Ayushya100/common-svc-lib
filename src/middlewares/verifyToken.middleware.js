@@ -11,6 +11,19 @@ import { CoreDB } from '../db/index.js';
 
 const log = logger('middleware: verify-token');
 
+/**
+ * verifyToken
+ *
+ * Middleware to authenticate incoming requests using JWT.
+ * Extracts access token from cookies or Authorization header,
+ * verifies token validity, attaches user data to the request, and initializes request-scoped context.
+ *
+ * @param {Object} req - Mutated to include `req.user` on successful verification.
+ * @param {Object} res
+ * @param {Function} next
+ * @returns {Promise<void>} - Proceeds to next middleware if authentication succeeds, otherwise forwards an authorization error.
+ */
+
 const verifyToken = async (req, res, next) => {
   try {
     log.info('Token verification operation initiated');
@@ -27,6 +40,7 @@ const verifyToken = async (req, res, next) => {
     const decodedToken = jwt.verify(token, tokenKey);
     req.user = {
       id: decodedToken.id,
+      sid: decodedToken.sid,
       username: decodedToken.username,
       role_code: decodedToken.role,
       scopes: decodedToken.scopes,
@@ -44,6 +58,13 @@ const verifyToken = async (req, res, next) => {
     if (!refreshToken && !jwt.verify(refreshToken, refreshTokenKey)) {
       log.error('Token not valid');
       next(_Error(401, 'User authentication token expired'));
+    }
+
+    if (
+      !req.headers['x-session-id'] ||
+      req.headers['x-session-id'] !== req.user.sid
+    ) {
+      req.headers['x-session-id'] = req.user.sid;
     }
 
     log.success('Token verification completed successfully');
