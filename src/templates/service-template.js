@@ -19,11 +19,30 @@ import {
   requestContextMiddleware,
   errorHandler,
   verifyToken,
+  correlationMiddleware,
+  sessionMiddleware,
 } from '../middlewares/index.js';
 import { generalServiceConfig } from '../../constants.js';
 import { initializeI18n } from '../utils/index.js';
 
 const log = logger('service-configuration');
+
+/**
+ * Service class responsible for initializing and running an Express-based HTTP service with security, middleware,
+ * OpenAPI validation, and lifecycle management.
+ *
+ * @class Service
+ *
+ * @param {Object} serviceConfig - Configuration object containing service metadata and network details.
+ * @param {boolean} [cookieEnabled=false] - Enables cookie parsing and signed cookies if true.
+ * @param {boolean} [openAPIEnabled=true] - Enables OpenAPI validation and Swagger UI if true.
+ * @param {boolean} [setUserContext=true] - Enables request-scoped user context middleware if true.
+ * @property {Object} app - Express application instance.
+ * @property {Object} serviceConfig - Service configuration object.
+ * @property {boolean} cookieEnabled - Indicates whether cookies are enabled.
+ * @property {boolean} openAPIEnabled - Indicates whether OpenAPI validation is enabled.
+ * @property {boolean} setUserContext - Indicates whether user context middleware is enabled.
+ */
 
 class Service {
   constructor(
@@ -55,6 +74,16 @@ class Service {
     this.initializeOpenAPI();
   }
 }
+
+/**
+ * Initializes core Express middlewares including payload limits, security headers, CORS, rate limiting, cookies, compression, static assets, and logging.
+ *
+ * @function initializeApp
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Configures and registers global application middleware.
+ */
 
 Service.prototype.initializeApp = function () {
   log.debug('App middlewares initialization');
@@ -170,6 +199,16 @@ Service.prototype.initializeApp = function () {
   this.app.use(infoLogger);
 };
 
+/**
+ * Initializes OpenAPI specification validation and Swagger UI.
+ *
+ * @function initializeOpenAPI
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Registers OpenAPI request/response validators and exposes Swagger documentation if enabled.
+ */
+
 Service.prototype.initializeOpenAPI = function () {
   log.debug('App openAPI validator middleware initialization');
   // Initialize OpenAPI Specs
@@ -189,6 +228,46 @@ Service.prototype.initializeOpenAPI = function () {
   }
 };
 
+/**
+ * Registers middleware to attach a correlation ID to incoming requests.
+ *
+ * @function setCorrelationId
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Adds correlation ID middleware to the application.
+ */
+
+Service.prototype.setCorrelationId = function () {
+  log.debug('Set correlation id to the request middleware initiated');
+  this.app.use(correlationMiddleware);
+};
+
+/**
+ * Registers middleware to attach a session ID to incoming requests.
+ *
+ * @function setSessionId
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Adds session ID middleware to the application.
+ */
+
+Service.prototype.setSessionId = function () {
+  log.debug('Set session id to the request middleware initiated');
+  this.app.use(sessionMiddleware);
+};
+
+/**
+ * Registers request-scoped user context middleware if enabled via configuration.
+ *
+ * @function setUserContextFn
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Adds user context middleware when enabled.
+ */
+
 Service.prototype.setUserContextFn = function () {
   if (this.setUserContext) {
     log.debug('App user context middleware initialized');
@@ -196,23 +275,74 @@ Service.prototype.setUserContextFn = function () {
   }
 };
 
+/**
+ * Registers publicly accessible service endpoints.
+ *
+ * @function registerPublicEndpoints
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Intended to be overridden by implementing services.
+ */
+
 Service.prototype.registerPublicEndpoints = function () {
   log.debug('Register service public end-points called');
 };
+
+/**
+ * Registers authentication token verification middleware.
+ *
+ * @function setTokenVerification
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Adds token verification middleware to the application.
+ */
 
 Service.prototype.setTokenVerification = function () {
   log.debug('Verification token middleware initialization');
   this.app.use(verifyToken);
 };
 
+/**
+ * Registers protected (authenticated) service endpoints.
+ *
+ * @function registerPrivateEndpoints
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Intended to be overridden by implementing services.
+ */
+
 Service.prototype.registerPrivateEndpoints = function () {
   log.debug('Register service private end-points');
 };
+
+/**
+ * Registers the global error handling middleware.
+ *
+ * @function registerErrorHandler
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Adds centralized error handling middleware.
+ */
 
 Service.prototype.registerErrorHandler = function () {
   log.debug('Global error handler middleware initialized');
   this.app.use(errorHandler);
 };
+
+/**
+ * Builds and starts the HTTP server, registers all middleware, initializes localization, and handles graceful shutdown.
+ *
+ * @function buildConnection
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {void} - Starts the server and attaches process-level shutdown handlers.
+ * @throws {Error} - Terminates the process if service configuration is missing.
+ */
 
 Service.prototype.buildConnection = function () {
   log.debug('Service build connection initiated');
@@ -221,6 +351,8 @@ Service.prototype.buildConnection = function () {
     process.exit(1);
   }
 
+  this.setCorrelationId();
+  this.setSessionId();
   this.setUserContextFn();
   initializeI18n();
   this.registerPublicEndpoints();
@@ -254,6 +386,17 @@ Service.prototype.buildConnection = function () {
     });
   }
 };
+
+/**
+ * Tests connectivity to the running service by invoking its health check endpoint with retry logic.
+ *
+ * @function testConnection
+ *
+ * @memberof Service.prototype
+ *
+ * @returns {Promise<void>} - Resolves when the service responds successfully.
+ * @throws {Error} - Thrown when the health check fails after all retries.
+ */
 
 Service.prototype.testConnection = async function () {
   log.debug('Service connection test initiated');
