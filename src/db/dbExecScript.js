@@ -6,9 +6,28 @@ import { logger } from '../utils/index.js';
 
 const log = logger('DB');
 
+/**
+ * DB
+ *
+ * Database execution layer responsible for running raw SQL queries using Knex and providing execution metrics such as memory and time.
+ *
+ * @class DB
+ */
+
 class DB {
+  // Creates an instance of DB.
   constructor() {}
 
+  /**
+   * Executes a raw SQL query with parameters.
+   *
+   * Logs execution time and memory usage for monitoring.
+   *
+   * @param {string} query
+   * @param {Array<any>} [params=[]]
+   * @returns {Promise<{ rowCount: number, rows: Array<Object> }>}
+   * @throws {Object}
+   */
   async execute(query, params = []) {
     try {
       log.debug(`Input Query: ${query}`);

@@ -1,5 +1,14 @@
 'use strict';
 
+/**
+ * convertToNativeTimezone
+ *
+ * Converts a datetime into a human-readable string based on the system's local timezone.
+ *
+ * @param {string | number | Date} datetime - Input datetime value (ISO string, timestamp, or Date object).
+ * @returns {string} - Formatted datetime string in `YYYY-MM-DD HH:mm:ss` format.
+ */
+
 const convertToNativeTimezone = (datetime) => {
   const date = new Date(datetime);
 

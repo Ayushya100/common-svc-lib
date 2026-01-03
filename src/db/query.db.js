@@ -6,7 +6,19 @@ import {
   RequestContext,
 } from '../utils/index.js';
 
+/**
+ * DBQuery
+ *
+ * SQL query builder utility responsible for generating dynamic INSERT and UPDATE queries with support for:
+ * - Field-to-column mapping
+ * - Request-scoped audit fields
+ * - Multiple table configurations
+ *
+ * @class DBQuery
+ */
+
 class DBQuery {
+  // Initializes table mappings.
   constructor() {
     this.tables = {
       SVC_CONFIG: 'SVC_CONFIG',
@@ -40,6 +52,14 @@ class DBQuery {
     };
   }
 
+  /**
+   * Maps array-based fields for SQL query generation.
+   *
+   * @param {string[]} arr
+   * @param {Object<string, string>} [mappingFields={}]
+   * @param {'insert' | 'update'} type
+   * @returns {string[]}
+   */
   mapArrFields(arr, mappingFields = {}, type) {
     return arr.map((field) => {
       if (!mappingFields[field]) {
@@ -51,6 +71,14 @@ class DBQuery {
     });
   }
 
+  /**
+   * Maps object-based fields for SQL query generation.
+   *
+   * @param {Object} obj
+   * @param {Object<string, string>} [mappingFields={}]
+   * @param {'insert' | 'update'} type
+   * @returns {string[]}
+   */
   mapObjFields(obj, mappingFields = {}, type) {
     const fields = Object.keys(obj);
     return fields.map((field) => {
@@ -63,7 +91,14 @@ class DBQuery {
     });
   }
 
-  // Standard Functions
+  /**
+   * Builds an INSERT query with audit fields.
+   *
+   * @param {string} table
+   * @param {Object<string, string>} mappingFields
+   * @param {Object | string[]} fields
+   * @returns {string}
+   */
   insertQuery(table, mappingFields, fields) {
     const userContext = RequestContext.get();
     const userId = userContext.id
@@ -95,6 +130,15 @@ class DBQuery {
       RETURNING ID;`;
   }
 
+  /**
+   * Builds an UPDATE query with audit fields.
+   *
+   * @param {string} table
+   * @param {Object<string, string>} mappingFields
+   * @param {Object | string[]} updateFields
+   * @param {Object | string[]} whereFields
+   * @returns {string}
+   */
   updateQuery(table, mappingFields, updateFields, whereFields) {
     const userContext = RequestContext.get();
     const userId = userContext.id
