@@ -32,6 +32,7 @@
     "prettier": "^3.7.4"
   },
   "dependencies": {
+    "amqplib": "^0.10.9",
     "async_hooks": "^1.0.0",
     "axios": "^1.13.2",
     "compression": "^1.8.1",
@@ -43,11 +44,14 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "i18n": "^0.15.3",
+    "ioredis": "^5.8.2",
+    "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.1.0",
     "morgan": "^1.10.1",
     "pg": "^8.16.3",
     "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
     "winston": "^3.19.0",
     "yaml": "^2.8.2"
   }

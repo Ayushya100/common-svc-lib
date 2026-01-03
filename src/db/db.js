@@ -7,6 +7,28 @@ dotenv.config({
   path: './env',
 });
 
+/**
+ * db
+ *
+ * Knex database client instance used to manage database connections and execute queries.
+ *
+ * Configuration is loaded from environment variables.
+ *
+ * @constant db
+ *
+ * @type {Object} - Knex client instance.
+ */
+
+/**
+ * @typedef {Object} DatabaseConnectionConfig
+ *
+ * @property {string} host - Database host address.
+ * @property {number|string} port - Database port.
+ * @property {string} user - Database username.
+ * @property {string} password - Database user password.
+ * @property {string} database - Database name.
+ */
+
 const db = knex({
   client: process.env.DB_CLIENT,
   connection: {

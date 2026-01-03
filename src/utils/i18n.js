@@ -8,6 +8,15 @@ import RequestContext from './RequestContext.js';
 
 const log = logger('util: localize');
 
+/**
+ * initializeI18n
+ *
+ * Initializes and configures the internationalization (i18n) system by loading locale files and setting default options.
+ *
+ * @throws {Error}
+ * @returns {void}
+ */
+
 function initializeI18n() {
   const localePath = path.resolve(process.cwd(), 'src/assets/i18n');
   if (!fs.existsSync(localePath)) {
@@ -25,6 +34,16 @@ function initializeI18n() {
   i18n.configure(options);
   log.debug(`i18n has been configured with options`);
 }
+
+/**
+ * translate
+ *
+ * Translates a message string into the active locale. Locale is resolved from the request context when available.
+ *
+ * @param {string} message
+ * @param {string} [locale='en-US'] - Fallback locale if request context is not available.
+ * @returns {string}
+ */
 
 function translate(message, locale = 'en-US') {
   const userContext = RequestContext.get();
